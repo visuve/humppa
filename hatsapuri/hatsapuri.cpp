@@ -1,5 +1,6 @@
-#include <iostream>
 #include <cmath>
+#include <iostream>
+#include <string>
 
 const std::wstring message[] =
 {
@@ -17,19 +18,28 @@ const std::wstring message[] =
 #if _WIN32
 #include <fcntl.h>
 #include <io.h>
-int wmain()
+int wmain(int argc, wchar_t** argv)
 {
 	_setmode(_fileno(stdout), _O_U8TEXT);
 #else
 #include <clocale>
-int main()
+int main(int argc, char** argv)
 {
 	std::setlocale(LC_ALL, "en_US.UTF-8");
 #endif
+
 	float radius = 20.0f;
-	std::wcout << L"Syötä hatšapurin koko: ";
-	std::wcin >> radius;
-	std::wcout << L'\n' << std::endl;
+
+	if (argc == 2)
+	{
+		radius = std::stof(argv[1]);
+	}
+	else
+	{
+		std::wcout << L"Syötä hatšapurin koko: ";
+		std::wcin >> radius;
+		std::wcout << L'\n' << std::endl;
+	}
 
 	float console_ratio = 2;
 	float w = console_ratio * radius;
