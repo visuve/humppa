@@ -11,3 +11,4 @@ endif()
 
 add_subdirectory("rutka")
 add_subdirectory("hatsapuri")
+add_subdirectory("kuusi")

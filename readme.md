@@ -9,3 +9,6 @@
 
 - [hatsapuri](hatsapuri/)
 	- Tulostaa georgialaisen juustoleivän
+
+- [kuusi](kuusi/)
+	- Vain glögi ja piparit puuttuu
