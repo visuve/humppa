@@ -1,14 +1,17 @@
 # Humppa
 
-- Viihteellisi‰ sovelluksia
+- Viihteellisi√§ sovelluksia
 
 ## Kansiot
 
 - [rutka](rutka/)
-	- J‰nnitt‰v‰ peli
+	- J√§nnitt√§v√§ peli
 
 - [hatsapuri](hatsapuri/)
-	- Tulostaa georgialaisen juustoleiv‰n
+	- Tulostaa georgialaisen juustoleiv√§n
 
 - [kuusi](kuusi/)
-	- Vain glˆgi ja piparit puuttuu
+	- Vain gl√∂gi ja piparit puuttuu
+
+- [ruletti](ruletti/)
+	- Todella vaarallinen peli. Omalla vastuulla.
