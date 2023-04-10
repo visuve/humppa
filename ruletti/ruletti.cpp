@@ -324,6 +324,7 @@ namespace roulette
 int wmain()
 {
 	_setmode(_fileno(stdout), _O_U8TEXT);
+	_setmode(_fileno(stderr), _O_U8TEXT);
 #else
 int main()
 {
@@ -337,6 +338,7 @@ int main()
 	catch (const std::exception& e)
 	{
 		std::wcerr << L"Ruletti kaatui: " << e.what() << std::endl;
+		return -1;
 	}
 	
 
