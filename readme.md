@@ -15,3 +15,6 @@
 
 - [ruletti](ruletti/)
 	- Todella vaarallinen peli. Omalla vastuulla.
+
+- [pultsarit](pultsarit/)
+	- Lentäviä lauseita pultsarien suusta. Elävästä elämästä.

@@ -1,0 +1,1 @@
+add_executable(pultsarit "pultsarit.cpp")
