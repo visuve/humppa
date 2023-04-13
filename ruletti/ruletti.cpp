@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <chrono>
+#include <clocale>
 #include <filesystem>
 #include <iostream>
 #include <optional>
@@ -24,7 +25,7 @@ namespace roulette
 		{
 		}
 
-		std::optional<std::filesystem::path> where(std::wstring_view executable) const
+		std::optional<std::filesystem::path> where(std::string_view executable) const
 		{
 			for (const std::filesystem::path directory : _directories)
 			{
@@ -33,7 +34,7 @@ namespace roulette
 				{
 					const auto item = entry.path();
 
-					if (item.filename().wstring() == executable)
+					if (item.filename().string() == executable)
 					{
 						return item;
 					}
@@ -157,26 +158,26 @@ namespace roulette
 			_cylinder(
 			{ 
 #if _WIN32
-				env.where(L"calc.exe"),
-				env.where(L"cmd.exe"),
-				env.where(L"control.exe"),
-				env.where(L"cscript.exe"),
-				env.where(L"diskmgmt.msc"),
-				env.where(L"msiexec.exe"),
-				env.where(L"powershell.exe"),
-				env.where(L"regedit.exe"),
-				env.where(L"rundll32.exe"),
-				env.where(L"Taskmgr.exe")
+				env.where("calc.exe"),
+				env.where("cmd.exe"),
+				env.where("control.exe"),
+				env.where("cscript.exe"),
+				env.where("diskmgmt.msc"),
+				env.where("msiexec.exe"),
+				env.where("powershell.exe"),
+				env.where("regedit.exe"),
+				env.where("rundll32.exe"),
+				env.where("Taskmgr.exe")
 #else
-				env.where(L"sh"),
-				env.where(L"bash"),
-				env.where(L"csh"),
-				env.where(L"tcsh"),
-				env.where(L"scsh"),
-				env.where(L"ksh"),
-				env.where(L"zsh"),
-				env.where(L"fish"),
-				env.where(L"ion")
+				env.where("sh"),
+				env.where("bash"),
+				env.where("csh"),
+				env.where("tcsh"),
+				env.where("scsh"),
+				env.where("ksh"),
+				env.where("zsh"),
+				env.where("fish"),
+				env.where("ion")
 #endif
 			}),
 			_chamber(_cylinder.end())
@@ -231,25 +232,25 @@ namespace roulette
 	struct slow_print
 	{
 		slow_print(
-			std::wstring_view message,
+			std::string_view message,
 			std::chrono::milliseconds delay = std::chrono::milliseconds(200)) :
 			_message(message),
 			_delay(delay)
 		{
 		}
 
-		friend std::wostream& operator << (std::wostream&, const slow_print&);
+		friend std::ostream& operator << (std::ostream&, const slow_print&);
 
 	private:
-		std::wstring_view _message;
+		std::string_view _message;
 		std::chrono::milliseconds _delay;
 	};
 
-	std::wostream& operator << (std::wostream& stream, const slow_print& s)
+	std::ostream& operator << (std::ostream& stream, const slow_print& s)
 	{
 		stream.flush();
 
-		for (wchar_t x : s._message)
+		for (char x : s._message)
 		{
 			std::this_thread::sleep_for(s._delay);
 			stream << x;
@@ -262,23 +263,23 @@ namespace roulette
 
 	void run()
 	{
-		std::wcout << L"Tervetuloa venäläiseen rulettiin!\n" << std::endl;
+		std::cout << "Tervetuloa venäläiseen rulettiin!\n" << std::endl;
 
 		environment env;
 		gun pyssy(env);
 
-		std::wcout << L"Pyssy ladattu. "
-			<< pyssy.cylinder_size() << L":n patruunan rullassa "
-			<< pyssy.bullet_count() << L" patruunaa" << std::endl;
+		std::cout << "Pyssy ladattu. "
+			<< pyssy.cylinder_size() << ":n patruunan rullassa "
+			<< pyssy.bullet_count() << " patruunaa" << std::endl;
 
-		std::wcout << L"Paina enter pyöräyttääksi rullaa tai " <<
-			L"x ja perään enter lopettaaksesi" << std::endl;
+		std::cout << "Paina enter pyöräyttääksi rullaa tai " <<
+			"x ja perään enter lopettaaksesi" << std::endl;
 
 		std::string line;
 
 		while (std::getline(std::cin, line) && line != "x")
 		{
-			std::wcout << L"Kierros " << pyssy.roll() << L" pyörähtää" << slow_print(L"...") << std::endl;
+			std::cout << "Kierros " << pyssy.roll() << " pyörähtää" << slow_print("...") << std::endl;
 
 			bool result = pyssy.trigger();
 			const cartridge& paukku = pyssy.chamber();
@@ -287,24 +288,24 @@ namespace roulette
 			{
 			case bullet_state::missing:
 			{
-				std::wcout << L"Pesässä ei ollut mitään. Onni oli myötä tällä kertaa." << std::endl;
+				std::cout << "Pesässä ei ollut mitään. Onni oli myötä tällä kertaa." << std::endl;
 				break;
 			}
 			case bullet_state::fired:
 			{
 				if (result)
 				{
-					std::wcout << paukku.bullet << L" pamahti! Nyt taisi käydä huonosti!" << std::endl;
+					std::cout << paukku.bullet << " pamahti! Nyt taisi käydä huonosti!" << std::endl;
 				}
 				else
 				{
-					std::wcout << L"Pesässä " << paukku.bullet << L" oli hylsy..." << std::endl;
+					std::cout << "Pesässä " << paukku.bullet << " oli hylsy..." << std::endl;
 				}
 				break;
 			}
 			case bullet_state::failure:
 			{
-				std::wcout << L"Patruuna " << paukku.bullet << L" ei pamahtanut. Onni oli myötä tällä kertaa." << std::endl;
+				std::cout << "Patruuna " << paukku.bullet << " ei pamahtanut. Onni oli myötä tällä kertaa." << std::endl;
 				break;
 			}
 			default:
@@ -318,18 +319,9 @@ namespace roulette
 	}
 }
 
-#ifdef _WIN32
-#include <fcntl.h>
-#include <io.h>
-int wmain()
-{
-	_setmode(_fileno(stdout), _O_U8TEXT);
-	_setmode(_fileno(stderr), _O_U8TEXT);
-#else
 int main()
 {
-	std::setlocale(LC_ALL, "en_US.UTF-8");
-#endif
+	std::setlocale(LC_ALL, "fi_FI.UTF-8");
 
 	try
 	{
@@ -337,10 +329,9 @@ int main()
 	}
 	catch (const std::exception& e)
 	{
-		std::wcerr << L"Ruletti kaatui: " << e.what() << std::endl;
+		std::cerr << "Ruletti kaatui: " << e.what() << std::endl;
 		return -1;
 	}
-	
 
 	return 0;
 }

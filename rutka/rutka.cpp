@@ -37,55 +37,48 @@ namespace rutka
 		return std::all_of(str.cbegin(), str.cend(), is_digit);
 	}
 
-	std::wstring read_numeric_input(std::wstring_view message)
+	std::string read_numeric_input(std::string_view message)
 	{
-		std::wstring input;
+		std::string input;
 
 		do
 		{
-			std::wcout << message << std::endl;
-			std::wcin >> input;
-		} while (!is_number<wchar_t>(input));
+			std::cout << message << std::endl;
+			std::cin >> input;
+		} while (!is_number<char>(input));
 
 		std::cout << std::endl;
 		return input;
 	}
 
-	std::wstring generate_numeric_secret(std::wstring_view guess)
+	std::string generate_numeric_secret(std::string_view guess)
 	{
-		std::wstring secret;
+		std::string secret;
 
 		do
 		{
 			const uint16_t number = random_number<uint16_t>();
-			secret += std::to_wstring(number);
+			secret += std::to_string(number);
 		} while (secret.length() <= guess.length());
 
 		return secret.erase(guess.length() + 1);
 	}
 }
 
-#ifdef _WIN32
-#include <fcntl.h>
-#include <io.h>
-int wmain()
-{
-	_setmode(_fileno(stdout), _O_U8TEXT);
-#else
 int main()
 {
-	std::setlocale(LC_ALL, "en_US.UTF-8");
-#endif
 	using namespace rutka;
 
-	std::wcout << L"Intialainen Rutka" << std::endl;
-	std::wcout << L"Idea kopioitu: tAAt" << std::endl << std::endl;;
+	std::setlocale(LC_ALL, "fi_FI.UTF-8");
 
-	const std::wstring guess = read_numeric_input(L"Syötä numero:");
+	std::cout << "Intialainen Rutka" << std::endl;
+	std::cout << "Idea kopioitu: tAAt" << std::endl << std::endl;;
 
-	std::wcout << L"Syöttämäsi luku:\t" << guess << std::endl;
-	std::wcout << L"Koneen luku:\t\t" << generate_numeric_secret(guess) << std::endl;
-	std::wcout << std::endl << L"Hävisit rutkasti." << std::endl;
+	const std::string guess = read_numeric_input("Syötä numero:");
+
+	std::cout << "Syöttämäsi luku:\t" << guess << std::endl;
+	std::cout << "Koneen luku:\t\t" << generate_numeric_secret(guess) << std::endl;
+	std::cout << std::endl << "Hävisit rutkasti." << std::endl;
 
 	return 0;
 }

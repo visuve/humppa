@@ -1,32 +1,24 @@
 #include <cmath>
+#include <clocale>
 #include <iostream>
 #include <string>
 
-const std::wstring message[] =
+const std::string message[] =
 {
 	{
-		L"Tässä on hatšapuri eli georgialainen juustoleipä "
-		L"ja tota ni hatša tarkoittaa juustoa, puri on leipä."
+		"Tässä on hatšapuri eli georgialainen juustoleipä "
+		"ja tota ni hatša tarkoittaa juustoa, puri on leipä."
 	},
 	{
-		L"Hatšapurissa on olennaista se, että aina sen verran, "
-		L"kun laitetaan taikinaa, niin aina saman verran "
-		L"laitetaan siihen myös juustoa."
+		"Hatšapurissa on olennaista se, että aina sen verran, "
+		"kun laitetaan taikinaa, niin aina saman verran "
+		"laitetaan siihen myös juustoa."
 	}
 };
 
-#if _WIN32
-#include <fcntl.h>
-#include <io.h>
-int wmain(int argc, wchar_t** argv)
-{
-	_setmode(_fileno(stdout), _O_U8TEXT);
-#else
-#include <clocale>
 int main(int argc, char** argv)
 {
-	std::setlocale(LC_ALL, "en_US.UTF-8");
-#endif
+	std::setlocale(LC_ALL, "fi_FI.UTF-8");
 
 	float radius = 20.0f;
 
@@ -36,9 +28,9 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		std::wcout << L"Syötä hatšapurin koko: ";
-		std::wcin >> radius;
-		std::wcout << L'\n' << std::endl;
+		std::cout << "Syötä hatšapurin koko: ";
+		std::cin >> radius;
+		std::cout << '\n' << std::endl;
 	}
 
 	float console_ratio = 2;
@@ -47,7 +39,7 @@ int main(int argc, char** argv)
 
 	for (const auto& line : message)
 	{
-		std::wcout << line << std::endl;
+		std::cout << line << std::endl;
 	}
 
 	for (int y = -h; y <= h; ++y)
@@ -58,18 +50,18 @@ int main(int argc, char** argv)
 
 			if (d < 0.9)
 			{
-				std::wcout << L'*';
+				std::cout << '*';
 			}
 			else if (d < 1.0)
 			{
-				std::wcout << L'#';
+				std::cout << '#';
 			}
 			else
 			{
-				std::wcout << L' ';
+				std::cout << ' ';
 			}
 		}
-		std::wcout << std::endl;
+		std::cout << std::endl;
 	}
 
 	return 0;
