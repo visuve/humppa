@@ -5,6 +5,7 @@
 #include <random>
 #include <string>
 #include <string_view>
+#include <clocale>
 
 namespace rutka
 {

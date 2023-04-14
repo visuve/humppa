@@ -1,6 +1,7 @@
 #include <iostream>
 #include <chrono>
 #include <clocale>
+#include <vector>
 
 const std::vector<std::u8string> encrypted_messages
 {
@@ -315,7 +316,7 @@ int main()
 		const auto now = std::chrono::system_clock::now();
 		const auto ymd = std::chrono::floor<std::chrono::days>(now);
 		
-		std::cout << "Nyt on " << std::format("{:%d.%m.%Y}.", ymd) << std::endl;
+		//std::cout << "Nyt on " << std::format("{:%d.%m.%Y}.", ymd) << std::endl;
 
 		const std::u8string motd = message_of_the_day(ymd);
 
