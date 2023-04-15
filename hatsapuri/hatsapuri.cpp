@@ -6,13 +6,16 @@
 const std::string message[] =
 {
 	{
-		"Tässä on hatšapuri eli georgialainen juustoleipä "
+		"   Tässä on hatšapuri eli georgialainen juustoleipä "
 		"ja tota ni hatša tarkoittaa juustoa, puri on leipä."
 	},
 	{
-		"Hatšapurissa on olennaista se, että aina sen verran, "
+		"   Hatšapurissa on olennaista se, että aina sen verran, "
 		"kun laitetaan taikinaa, niin aina saman verran "
 		"laitetaan siihen myös juustoa."
+	},
+	{
+		"   Se on semmonen homma, että huulia ei tarvitse rasvata hetkeen!"
 	}
 };
 
@@ -37,10 +40,8 @@ int main(int argc, char** argv)
 	float w = console_ratio * radius;
 	float h = radius;
 
-	for (const auto& line : message)
-	{
-		std::cout << line << std::endl;
-	}
+	std::cout << message[0] << std::endl;
+	std::cout << message[1] << std::endl;
 
 	for (int y = -h; y <= h; ++y)
 	{
@@ -61,8 +62,11 @@ int main(int argc, char** argv)
 				std::cout << ' ';
 			}
 		}
+
 		std::cout << std::endl;
 	}
+	
+	std::cout << '\n' << message[2] << '\n' << std::endl;
 
 	return 0;
 }
