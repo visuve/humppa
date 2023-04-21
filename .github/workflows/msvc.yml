@@ -15,14 +15,18 @@ jobs:
         cmake -G "Visual Studio 17 2022" -A x64 ..
         msbuild hassuttelu.sln /p:Platform=x64 /p:Configuration=Release /m
 
-    - name: Print hashes
+    - name: Print Hashes
       shell: pwsh
       run: |
-        Get-ChildItem "x64/Release/*.exe" | Get-FileHash -Algorithm SHA512 | Format-List
+        Get-ChildItem "x64/Release/*.exe" | Get-FileHash -Algorithm SHA256 | Format-List | Tee-Object tiivisteet.txt
 
-    - uses: actions/upload-artifact@v3
+    - name: Create Release
+      uses: "marvinpinto/action-automatic-releases@latest"
       with:
-        name: Executables
-        path: |
-           x64/Release/*.exe
-        if-no-files-found: error
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Automaagikäännös"
+          files: |
+            tiivisteet.txt
+            x64/Release/*.exe
