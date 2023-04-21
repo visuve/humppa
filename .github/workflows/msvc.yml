@@ -1,0 +1,28 @@
+name: MSVC build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: microsoft/setup-msbuild@v1.1
+
+    - name: Build x64
+      run: |
+        mkdir x64 && cd x64
+        cmake -G "Visual Studio 17 2022" -A x64 ..
+        msbuild hassuttelu.sln /p:Platform=x64 /p:Configuration=Release /m
+
+    - name: Print hashes
+      shell: pwsh
+      run: |
+        Get-ChildItem "x64/Release/*.exe" | Get-FileHash -Algorithm SHA512 | Format-List
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: Executables
+        path: |
+           x64/Release/*.exe
+        if-no-files-found: error
