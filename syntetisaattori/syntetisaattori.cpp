@@ -1,27 +1,68 @@
 #include <fstream>
 #include <numbers>
+#include <cassert>
+#include <iostream>
 
-struct note
+class note_base
 {
-	note(double frequency, double seconds) :
-		frequency(frequency),
+public:
+	constexpr note_base(float seconds) :
 		seconds(seconds)
 	{
 	}
 
-	double value(double amplitude, double time_point) const
+	const double seconds;
+
+	virtual int64_t value(const double amplitude, const double time_point) const = 0;
+
+	static constexpr double quarter_turn = std::numbers::pi / 2.0;
+	static constexpr double half_turn = std::numbers::pi;
+	static constexpr double full_turn = std::numbers::pi * 2.0;
+};
+
+class note : public note_base
+{
+public:
+	constexpr note(double seconds, double frequency) :
+		note_base(seconds),
+		frequency(frequency)
 	{
-		const double amplitude_radians = std::numbers::pi * (time_point / seconds);
-		const double smoothening = std::atan(20.0 * std::sin(amplitude_radians)) / std::atan(20);
-
-		amplitude *= smoothening;
-
-		const double frequency_radians = 2.0 * std::numbers::pi * time_point;
-		return amplitude * std::sin(frequency_radians * frequency);
 	}
 
-	double frequency;
-	double seconds;
+	int64_t value(const double amplitude, const double time_point) const override
+	{
+		const double amplitude_radians = half_turn * (time_point / seconds);
+		const double smoothening = std::atan(20.0 * std::sin(amplitude_radians)) / std::atan(20);
+		const double frequency_radians = full_turn * time_point * frequency;
+		return amplitude * smoothening * std::sin(frequency_radians);
+	}
+
+	const double frequency;
+};
+
+class note_range : public note_base
+{
+public:
+	constexpr note_range(double seconds, double frequency_from, double frequency_to) :
+		note_base(seconds),
+		frequency_from(frequency_from),
+		frequency_to(frequency_to)
+	{
+	}
+
+	int64_t value(const double amplitude, const double time_point) const override
+	{
+		const double diff = frequency_to - frequency_from;
+		const double progress = time_point / seconds;
+		const double delta = diff * progress;
+		const double frequency = frequency_from + delta;
+
+		const double frequency_radians = full_turn * time_point * frequency;
+		return amplitude * std::sin(frequency_radians);
+	}
+
+	const double frequency_from;
+	const double frequency_to;
 };
 
 class wave
@@ -29,7 +70,7 @@ class wave
 public:
 	struct chunk
 	{
-		chunk(uint32_t identifier, uint32_t size) :
+		constexpr chunk(uint32_t identifier, uint32_t size) :
 			identifier(identifier),
 			size(size)
 		{
@@ -43,7 +84,7 @@ public:
 	
 	struct riff_chunk : chunk
 	{
-		riff_chunk() :
+		constexpr riff_chunk() :
 			chunk(0x46464952, 36) // "RIFF"
 		{
 		}
@@ -53,7 +94,7 @@ public:
 
 	struct fmt_chunk : chunk
 	{
-		fmt_chunk() :
+		constexpr fmt_chunk() :
 			chunk(0x20746D66, 16) // "fmt "
 		{
 		}
@@ -62,13 +103,13 @@ public:
 		uint16_t channels = 0;
 		uint32_t samples_per_second = 0;
 		uint32_t bytes_per_second = 0;
-		uint16_t bytes_per_sample = 0;
+		uint16_t bytes_per_frame = 0;
 		uint16_t bits_per_sample = 0;
 	};
 
 	struct data_chunk : chunk
 	{
-		data_chunk() :
+		constexpr data_chunk() :
 			chunk(0x61746164, 0) // "data"
 		{
 		}
@@ -93,15 +134,19 @@ public:
 			}
 		}
 
-		void put(const fmt_chunk& fmt, double sample)
+		void put(const fmt_chunk& fmt, int64_t sample)
 		{
-			static size_t bytes_per_sample_per_channel = fmt.bits_per_sample / 8u;
+			char* data = reinterpret_cast<char*>(&sample);
+
+			const size_t bytes_per_channel = fmt.bytes_per_frame / fmt.channels;
 
 			for (uint16_t channel = 1u; channel <= fmt.channels; ++channel)
 			{
-				auto data = static_cast<size_t>(sample);
-				std::memcpy(&bytes[size], &data, bytes_per_sample_per_channel);
-				size += bytes_per_sample_per_channel;
+				for (size_t i = 0; i < bytes_per_channel; ++i)
+				{
+					bytes[size] = data[i];
+					++size;
+				}
 			}
 		}
 
@@ -112,33 +157,32 @@ public:
 	wave(const wave&) = delete;
 	wave(wave&&) = delete;
 
-	wave(const fmt_chunk& fmt) :
+	constexpr wave(const fmt_chunk& fmt) :
 		_fmt(fmt)
 	{
-		_fmt.bytes_per_sample = (_fmt.bits_per_sample / 8u) * _fmt.channels;
-		_fmt.bytes_per_second = _fmt.samples_per_second * _fmt.bytes_per_sample;
+		_fmt.bytes_per_second = _fmt.samples_per_second * _fmt.bytes_per_frame * _fmt.channels;
+		_fmt.bytes_per_frame = (_fmt.bits_per_sample / 8u) * _fmt.channels;
 	}
 
 	~wave()
 	{
 	}
 
-	wave& operator << (const note& n)
+	wave& operator << (const note_base& n)
 	{
 		const size_t samples_required = _fmt.samples_per_second * n.seconds;
-		const size_t bytes_required = _fmt.bytes_per_sample * samples_required * _fmt.channels;
+		const size_t bytes_required = _fmt.bytes_per_frame * samples_required;
 		const size_t new_size = _data.size + bytes_required;
 		
 		_data.realloc(new_size);
 
-		const size_t damping = 4u; // Must divide at least by two 
+		const double damping = 4.0; // Must divide at least by two 
 		const double amplitude = std::pow(2u, _fmt.bits_per_sample) / damping;
 
-		for (size_t i = 1; i <= samples_required; ++i)
+		for (size_t i = 1u; i <= samples_required; ++i)
 		{
 			const double time_point = double(i) / _fmt.samples_per_second;
-			const double sample = n.value(amplitude, time_point);
-			
+			const int64_t sample = n.value(amplitude, time_point);
 			_data.put(_fmt, sample);
 		}
 
@@ -187,7 +231,7 @@ std::ostream& operator << (std::ostream& out, const wave::fmt_chunk& fmt)
 	write(out, fmt.channels);
 	write(out, fmt.samples_per_second);
 	write(out, fmt.bytes_per_second);
-	write(out, fmt.bytes_per_sample);
+	write(out, fmt.bytes_per_frame);
 	write(out, fmt.bits_per_sample);
 	return out;
 }
@@ -200,36 +244,26 @@ std::ostream& operator << (std::ostream& out, const wave& wav)
 	return out;
 }
 
-int main()
+void for_elise(wave& wav)
 {
-	srand(123);
+	constexpr double seconds = 0.18;
+	constexpr note c(seconds, 261);
+	constexpr note cis(seconds, 278);
+	constexpr note d(seconds, 294);
+	constexpr note dis(seconds, 311);
+	constexpr note e(seconds, 330);
+	constexpr note f(seconds, 349);
+	constexpr note fis(seconds, 370);
+	constexpr note g(seconds, 392);
+	constexpr note gis(seconds, 415);
+	constexpr note a(seconds, 440);
+	constexpr note ais(seconds, 466);
+	constexpr note h(seconds, 494);
+	constexpr note a2(0.5, 220);
+	constexpr note h2(seconds, 247);
+	constexpr note p(0.13, 0);
 
-	wave::fmt_chunk fmt;
-	fmt.format = 1; // PCM
-	fmt.channels = 2;
-	fmt.samples_per_second = 44100;
-	fmt.bits_per_sample = 16;
-
-	wave wav(fmt);
-
-	const double seconds = 0.18;
-	note c(261, seconds);
-	note cis(278, seconds);
-	note d(294, seconds);
-	note dis(311, seconds);
-	note e(330, seconds);
-	note f(349, seconds);
-	note fis(370, seconds);
-	note g(392, seconds);
-	note gis(415, seconds);
-	note a(440, seconds);
-	note ais(466, seconds);
-	note h(494, seconds);
-	note a2(220, 0.5);
-	note h2(247, seconds);
-	note p(0, seconds);
-
-	wav << e << p;
+	wav << p << e << p;
 	wav << dis << p;
 	wav << e << p;
 	wav << dis << p;
@@ -238,13 +272,59 @@ int main()
 	wav << d << p;
 	wav << c << p;
 	wav << a2 << p;
+}
 
-	std::ofstream file("jytke.wav", std::ios_base::binary);
+void bass_test(wave& wav)
+{
+	wav << note_range(60.0, 1.0, 100);
+	wav << note(1.0, 0);
+	wav << note_range(30.0, 100, 1.0);
+}
+
+void tylsa(wave& wav)
+{
+	wav << note(120.0, 261.6);
+}
+
+int main(int argc, char** argv)
+{
+	wave::fmt_chunk fmt;
+	fmt.format = 1; // PCM
+	fmt.channels = 2;
+	fmt.samples_per_second = 44100;
+	fmt.bits_per_sample = 16;
+
+	wave wav(fmt);
+
+
+	std::string filename;
+
+	if (argc <= 1)
+	{
+		return -1;
+	}
+	else if (strcmp(argv[1], "beethoven") == 0)
+	{
+		for_elise(wav);
+		filename = "for_elise.wav";
+	}
+	else if (strcmp(argv[1], "bassoa") == 0)
+	{
+		bass_test(wav);
+		filename = "bassotesti.wav";
+	}
+	else if (strcmp(argv[1], "refe") == 0)
+	{
+		tylsa(wav);
+		filename = "refe.wav";
+	}
+
+	std::ofstream file(filename, std::ios_base::binary);
 	file << wav;
 	file.close();
 
-	// For debugging
-	//system("jytke.wav");
+	// Hope you have a default association
+	system(filename.c_str());
 
 	return 0;
 }
