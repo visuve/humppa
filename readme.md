@@ -18,3 +18,6 @@
 
 - [pultsarit](pultsarit/)
 	- Lentäviä lauseita pultsarien suusta. Elävästä elämästä.
+
+- [syntetisaattori](syntetisaattori/)
+	- Jytkettä
