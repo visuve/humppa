@@ -1,7 +1,5 @@
 #include <fstream>
 #include <numbers>
-#include <cassert>
-#include <iostream>
 
 class note_base
 {
@@ -137,6 +135,11 @@ public:
 		void put(const fmt_chunk& fmt, int64_t sample)
 		{
 			char* data = reinterpret_cast<char*>(&sample);
+
+			if (fmt.bits_per_sample == 8) // 8-bit is unsigned (usually)
+			{
+				data[0] += 0x80;
+			}
 
 			const size_t bytes_per_channel = fmt.bytes_per_frame / fmt.channels;
 
