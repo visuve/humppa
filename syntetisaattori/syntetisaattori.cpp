@@ -4,12 +4,14 @@
 class note_base
 {
 public:
-	constexpr note_base(float seconds) :
-		seconds(seconds)
+	constexpr note_base(double seconds, double frequency) :
+		seconds(seconds),
+		frequency(frequency)
 	{
 	}
 
 	const double seconds;
+	const double frequency;
 
 	virtual int64_t value(const double amplitude, const double time_point) const = 0;
 
@@ -22,45 +24,44 @@ class note : public note_base
 {
 public:
 	constexpr note(double seconds, double frequency) :
-		note_base(seconds),
-		frequency(frequency)
+		note_base(seconds, frequency),
+		amplitude_step(half_turn / seconds),
+		frequency_step(full_turn * frequency)
 	{
 	}
 
 	int64_t value(const double amplitude, const double time_point) const override
 	{
-		const double amplitude_radians = half_turn * (time_point / seconds);
+		const double amplitude_radians = amplitude_step * time_point;
 		const double smoothening = std::atan(20.0 * std::sin(amplitude_radians)) / std::atan(20);
-		const double frequency_radians = full_turn * time_point * frequency;
+		const double frequency_radians = frequency_step * time_point;
 		return amplitude * smoothening * std::sin(frequency_radians);
 	}
 
-	const double frequency;
+	const double amplitude_step;
+	const double frequency_step;
 };
 
 class note_range : public note_base
 {
 public:
-	constexpr note_range(double seconds, double frequency_from, double frequency_to) :
-		note_base(seconds),
-		frequency_from(frequency_from),
-		frequency_to(frequency_to)
+	note_range(double seconds, double frequency_from, double frequency_to) :
+		note_base(seconds, frequency_from),
+		frequency_step(full_turn * frequency),
+		frequency_adjustment(half_turn * (frequency_to - frequency_from) / seconds)
 	{
 	}
 
 	int64_t value(const double amplitude, const double time_point) const override
 	{
-		const double diff = frequency_to - frequency_from;
-		const double progress = time_point / seconds;
-		const double delta = diff * progress;
-		const double frequency = frequency_from + delta;
-
-		const double frequency_radians = full_turn * time_point * frequency;
-		return amplitude * std::sin(frequency_radians);
+		const double adjustment = frequency_adjustment * time_point;
+		const double frequency_radians = (frequency_step + adjustment) * time_point;
+		const double result = amplitude * std::sin(frequency_radians);
+		return result;
 	}
 
-	const double frequency_from;
-	const double frequency_to;
+	const double frequency_step;
+	const double frequency_adjustment;
 };
 
 class wave
@@ -279,9 +280,8 @@ void for_elise(wave& wav)
 
 void bass_test(wave& wav)
 {
-	wav << note_range(60.0, 1.0, 100);
-	wav << note(1.0, 0);
-	wav << note_range(30.0, 100, 1.0);
+	wav << note_range(30.0, 0.1, 100);
+	wav << note_range(30.0, 100, 0.1);
 }
 
 void tylsa(wave& wav)
