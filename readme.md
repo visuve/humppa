@@ -21,3 +21,6 @@
 
 - [syntetisaattori](syntetisaattori/)
 	- Jytkettä
+
+- [pertti](pertti/)
+	Perttikirjoitin. Hengennostatusta merkkijonoilla.

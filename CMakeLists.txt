@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project("hassuttelu" LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(EXECUTABLE_OUTPUT_PATH "..")
@@ -18,3 +18,4 @@ add_subdirectory("kuusi")
 add_subdirectory("ruletti")
 add_subdirectory("pultsarit")
 add_subdirectory("syntetisaattori")
+add_subdirectory("pertti")
