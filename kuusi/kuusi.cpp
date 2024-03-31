@@ -14,7 +14,7 @@ char random_filler()
 {
 	thread_local std::random_device device;	
 	thread_local std::mt19937 engine(device());
-	std::uniform_int_distribution<size_t> distribution(0, sizeof(fillers));
+	std::uniform_int_distribution<size_t> distribution(0, sizeof(fillers) - 1);
 	size_t index = distribution(engine);
 	return fillers[index];
 }

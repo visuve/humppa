@@ -1,0 +1,13 @@
+[package]
+name = "kuusi"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+rand = "0.8"
+
+[[bin]]
+name = "kuusi"
+path = "kuusi.rs"
+
+# https://doc.rust-lang.org/cargo/reference/manifest.html
