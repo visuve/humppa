@@ -1,0 +1,10 @@
+[package]
+name = "pertti"
+version = "1.0.0"
+edition = "2021"
+
+[[bin]]
+name = "pertti"
+path = "pertti.rs"
+
+# https://doc.rust-lang.org/cargo/reference/manifest.html
