@@ -2,35 +2,39 @@
 #include <clocale>
 #include <random>
 
+template <typename T>
 class coin_toss
 {
 public:
 	coin_toss() :
 		_engine(_device()),
 		_distribution(
-			std::numeric_limits<int64_t>::min(),
-			std::numeric_limits<int64_t>::max())
+			std::numeric_limits<T>::min(),
+			std::numeric_limits<T>::max())
 	{
 		_value = _distribution(_engine);
 	}
 
 	operator bool()
 	{
-		if (_iter >= 63)
+		constexpr size_t last_bit_index = 
+			std::numeric_limits<T>::digits - std::is_unsigned<T>::value;
+
+		if (_index >= last_bit_index)
 		{
 			_value = _distribution(_engine);
-			_iter = 0;
+			_index = 0;
 		}
 
-		return _value & (1ULL << _iter++);
+		return _value & (T(1) << _index++);
 	}
 private:
 	std::random_device _device;
 	std::mt19937 _engine;
-	std::uniform_int_distribution<int64_t> _distribution;
+	std::uniform_int_distribution<T> _distribution;
 
-	uint8_t _iter = 0;
-	int64_t _value = 0;
+	uint8_t _index = 0;
+	T _value = 0;
 };
 
 int main(int argc, char** argv)
@@ -50,7 +54,7 @@ int main(int argc, char** argv)
 		std::cout << std::endl;
 	}
 
-	coin_toss toss;
+	coin_toss<int64_t> toss;
 
 	for (char& c : text)
 	{
