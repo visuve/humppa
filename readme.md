@@ -24,3 +24,6 @@
 
 - [pertti](pertti/)
 	Perttikirjoitin. Hengennostatusta merkkijonoilla.
+
+- [tsydegeeli](tsydegeeli/)
+	Pertihtävä kirjoitin. Aakkoslukkotykittelyä.

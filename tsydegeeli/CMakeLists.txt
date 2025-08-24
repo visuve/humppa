@@ -1,0 +1,1 @@
+add_executable("tsydegeeli" "tsydegeeli.cpp")
