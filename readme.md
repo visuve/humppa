@@ -5,13 +5,13 @@
 ## Kansiot
 
 - [rutka](rutka/)
-	- Jännittävä peli
+	- Intialainen rutka. Jännittävä peli.
 
 - [hatsapuri](hatsapuri/)
-	- Tulostaa georgialaisen juustoleivän
+	- Tulostaa georgialaisen juustoleivän.
 
 - [kuusi](kuusi/)
-	- Vain glögi ja piparit puuttuu
+	- Vain glögi ja piparit puuttuu.
 
 - [ruletti](ruletti/)
 	- Todella vaarallinen peli. Omalla vastuulla.
@@ -20,10 +20,13 @@
 	- Lentäviä lauseita pultsarien suusta. Elävästä elämästä.
 
 - [syntetisaattori](syntetisaattori/)
-	- Jytkettä
+	- Jytkettä!
 
 - [pertti](pertti/)
 	Perttikirjoitin. Hengennostatusta merkkijonoilla.
 
 - [tsydegeeli](tsydegeeli/)
 	Pertihtävä kirjoitin. Aakkoslukkotykittelyä.
+
+- [niukka](niukka/)
+	- Persialainen niukka. Vähemmän jännittävä peli.

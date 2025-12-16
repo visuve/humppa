@@ -52,7 +52,7 @@ namespace rutka
 		return input;
 	}
 
-	std::string generate_numeric_secret(std::string_view guess)
+	std::string generate_longer_numeric_text(std::string_view guess)
 	{
 		std::string secret;
 
@@ -68,17 +68,15 @@ namespace rutka
 
 int main()
 {
-	using namespace rutka;
-
 	std::setlocale(LC_ALL, "fi_FI.UTF-8");
 
 	std::cout << "Intialainen Rutka" << std::endl;
 	std::cout << "Idea kopioitu: tAAt" << std::endl << std::endl;;
 
-	const std::string guess = read_numeric_input("Syötä numero:");
+	const std::string guess = rutka::read_numeric_input("Syötä numero:");
 
 	std::cout << "Syöttämäsi luku:\t" << guess << std::endl;
-	std::cout << "Koneen luku:\t\t" << generate_numeric_secret(guess) << std::endl;
+	std::cout << "Koneen luku:\t\t" << rutka::generate_longer_numeric_text(guess) << std::endl;
 	std::cout << std::endl << "Hävisit rutkasti." << std::endl;
 
 	return 0;
