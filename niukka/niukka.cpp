@@ -18,7 +18,7 @@ namespace niukka
 			return false;
 		}
 
-		auto is_digit = [](C c)
+		const auto is_digit = [](C c)
 		{
 			static std::locale loc;
 			return std::isdigit(c, loc);
@@ -45,13 +45,14 @@ namespace niukka
 	{
 		for (char& c : guess | std::views::reverse)
 		{
-			if (c != '9')
+			if (c == '9')
 			{
-				++c;
-				return guess;
+				c = '0';
+				continue;
 			}
 
-			c = '0';
+			++c;
+			return guess;
 		}
 
 		guess.insert(guess.begin(), '1');
