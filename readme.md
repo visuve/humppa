@@ -23,10 +23,13 @@
 	- Jytkettä!
 
 - [pertti](pertti/)
-	Perttikirjoitin. Hengennostatusta merkkijonoilla.
+	- Perttikirjoitin. Hengennostatusta merkkijonoilla.
 
 - [tsydegeeli](tsydegeeli/)
-	Pertihtävä kirjoitin. Aakkoslukkotykittelyä.
+	- Pertihtävä kirjoitin. Aakkoslukkotykittelyä.
 
 - [niukka](niukka/)
 	- Persialainen niukka. Vähemmän jännittävä peli.
+
+- [poelkky](poelkky/)
+	- Nyt kirjoitetaan isolla!
